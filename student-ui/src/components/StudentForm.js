@@ -58,7 +58,9 @@ function StudentForm({ fetchStudents, editingStudent, setEditingStudent }) {
             );
 
             if (!response.ok) {
-                throw new Error(isEditing ? "Failed to update student" : "Failed to add student");
+                const errorData = await response.json().catch(() => ({}));
+                const errorMsg = errorData.message || `HTTP ${response.status}`;
+                throw new Error(isEditing ? `Failed to update: ${errorMsg}` : `Failed to add: ${errorMsg}`);
             }
 
             const result = await response.json();

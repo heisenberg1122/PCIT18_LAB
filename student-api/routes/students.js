@@ -52,7 +52,7 @@ router.get('/', async (req,res, next) => {
 
 //Update a student
 router.put('/:id', async (req,res, next) => {
-    try {z
+    try {
         const updatedStudent = await Student.findByIdAndUpdate(
             req.params.id,
             req.body,
