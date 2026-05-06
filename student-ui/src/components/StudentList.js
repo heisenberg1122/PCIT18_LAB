@@ -1,6 +1,6 @@
 import React from "react";
 
-function StudentList({ students, fetchStudents }) {
+function StudentList({ students, fetchStudents, setEditingStudent }) {
     const deleteStudent = async (id) => {
         try {
             const response = await fetch(`http://localhost:3000/api/students/${id}`, {
@@ -31,6 +31,7 @@ function StudentList({ students, fetchStudents }) {
                 {Array.isArray(students) && students.map((student) => (
                     <li key={student._id}>
                         {student.firstname} {student.lastname} - {student.course} - Year {student.year_level} - Section {student.section} -
+                        <button onClick={() => setEditingStudent(student)} style={{ marginLeft: "8px" }}>Edit</button>
                         <button onClick={() => deleteStudent(student._id)}>Delete</button>
                     </li>
                 ))}

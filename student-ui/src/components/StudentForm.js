@@ -1,12 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function StudentForm({ fetchStudents }) {
+function StudentForm({ fetchStudents, editingStudent, setEditingStudent }) {
     const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
     const [course, setCourse] = useState("");
     const [yearLevel, setYearLevel] = useState("");
     const [section, setSection] = useState("");
     const [gender, setGender] = useState("");
+
+    useEffect(() => {
+        if (editingStudent) {
+            setFirstname(editingStudent.firstname || "");
+            setLastname(editingStudent.lastname || "");
+            setCourse(editingStudent.course || "");
+            setYearLevel(editingStudent.year_level ? String(editingStudent.year_level) : "");
+            setSection(editingStudent.section || "");
+            setGender(editingStudent.gender || "");
+            return;
+        }
+
+        setFirstname("");
+        setLastname("");
+        setCourse("");
+        setYearLevel("");
+        setSection("");
+        setGender("");
+    }, [editingStudent]);
 
     const handleSubmit = async (e) => {
         e.preventDefault(); 
@@ -17,8 +36,13 @@ function StudentForm({ fetchStudents }) {
         }
         
         try {
-            const response = await fetch("http://localhost:3000/api/students", {
-                method: "POST",
+            const isEditing = Boolean(editingStudent?._id);
+            const response = await fetch(
+                isEditing
+                    ? `http://localhost:3000/api/students/${editingStudent._id}`
+                    : "http://localhost:3000/api/students",
+                {
+                method: isEditing ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -30,34 +54,40 @@ function StudentForm({ fetchStudents }) {
                     section,
                     gender
                 }),
-            });
+                }
+            );
 
             if (!response.ok) {
-                throw new Error("Failed to add student");
+                throw new Error(isEditing ? "Failed to update student" : "Failed to add student");
             }
 
             const result = await response.json();
 
             if (result.success) {
-                alert("Student added successfully!");
+                alert(isEditing ? "Student updated successfully!" : "Student added successfully!");
                 setFirstname("");
                 setLastname("");
                 setCourse("");
                 setYearLevel("");
                 setSection("");
                 setGender("");
+                setEditingStudent(null);
                 fetchStudents();
             } else {
-                alert(result.message || "Failed to add student");
+                alert(result.message || (isEditing ? "Failed to update student" : "Failed to add student"));
             }
         } catch (error) {
             alert("Error: " + error.message);
         }
     };
 
+    const cancelEdit = () => {
+        setEditingStudent(null);
+    };
+
     return (
         <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-            <h2>Add Student</h2>
+            <h2>{editingStudent ? "Edit Student" : "Add Student"}</h2>
             <input
                 type="text"
                 placeholder="First Name"
@@ -94,7 +124,12 @@ function StudentForm({ fetchStudents }) {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
             />
-            <button type="submit">Add Student</button>
+            <button type="submit">{editingStudent ? "Update Student" : "Add Student"}</button>
+            {editingStudent && (
+                <button type="button" onClick={cancelEdit} style={{ marginLeft: "8px" }}>
+                    Cancel
+                </button>
+            )}
         </form>
     );
 }
