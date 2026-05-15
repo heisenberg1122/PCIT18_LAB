@@ -35,7 +35,10 @@ const studentSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-
+    enrolled: {
+        type: Boolean,
+        default: false
+    }
 });
 
 //Model

@@ -6,8 +6,8 @@ const Student = require('../models/Student');
 
 router.post('/', async (req,res, next)=> {
     try {
-        const {name, firstname, lastname, course, year_level, section, gender} = req.body;
-        const student = new Student({name, firstname, lastname, course, year_level, section, gender});
+        const {name, firstname, lastname, course, year_level, section, gender, enrolled} = req.body;
+        const student = new Student({name, firstname, lastname, course, year_level, section, gender, enrolled});
         await student.save();
         res.status(201).json({
             success: true,
